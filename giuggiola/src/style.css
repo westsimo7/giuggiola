@@ -156,7 +156,26 @@ h1,h2,h3{font-family:var(--font-display);font-weight:400;letter-spacing:-.01em;m
 .grid--articles{grid-template-columns:repeat(3,1fr);}
 .grid--books{grid-template-columns:repeat(3,1fr);}
 @media (max-width:900px){.grid--articles,.grid--books{grid-template-columns:1fr 1fr;}}
-@media (max-width:620px){.grid--articles,.grid--books{grid-template-columns:1fr;}}
+@media (max-width:620px){
+  .grid--books{grid-template-columns:1fr;}
+  /* Pensieri: horizontal swipe slider on phones instead of a vertical stack */
+  .grid--articles{
+    display:flex;
+    grid-template-columns:none;
+    gap:16px;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    margin:0 -32px;            /* bleed past .wrap padding so cards reach the edges */
+    padding:4px 32px 18px;     /* re-inset first/last card + room for card shadow */
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .grid--articles::-webkit-scrollbar{display:none;}
+  .grid--articles > .card{
+    flex:0 0 82%;              /* one card at a time, next one peeking */
+    scroll-snap-align:center;
+  }
+}
 
 /* ---------- Article card ---------- */
 .card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:30px 28px 24px;
