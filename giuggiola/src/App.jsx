@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { ARTICLES, BOOKS } from './data'
 import {
   Navbar, Hero, SectionHead, ArticleCard, BookCard,
-  ChiSono, Footer, ArticleView, PurchaseModal, ArrowLink,
+  ChiSono, Footer, ArticleView, PurchaseModal, ArrowLink, Intro,
 } from './components'
 import {
   useTweaks, TweaksPanel, TweakSection, TweakRadio,
@@ -37,6 +37,10 @@ function useReveal(dep) {
 
 export default function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS)
+  const [showIntro, setShowIntro] = useState(() =>
+    !(typeof window !== 'undefined' && window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  )
   const [view, setView] = useState({ name: 'home' })
   const [library, setLibrary] = useState([])
   const [modalBook, setModalBook] = useState(null)
@@ -73,6 +77,8 @@ export default function App() {
 
   return (
     <div className="site">
+      {showIntro && <Intro onDone={() => setShowIntro(false)} />}
+
       <Navbar go={go} current={view.name === 'article' ? 'pensieri' : view.name}
         cartCount={library.length} onCart={() => go('libri')} />
 

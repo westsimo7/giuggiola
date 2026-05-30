@@ -355,3 +355,71 @@ select.twk-field{padding-right:22px;}
   cursor:pointer;color:#29261b;
   -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);}
 .twk-open-btn:hover{background:rgba(255,255,255,.98);}
+
+/* ---------- Intro animation ---------- */
+.intro{position:fixed;inset:0;z-index:2147483647;background:#fff;
+  display:grid;place-items:center;overflow:hidden;transition:opacity .55s ease;}
+.intro--out{opacity:0;pointer-events:none;}
+.intro__scene{perspective:1400px;perspective-origin:50% 44%;}
+
+/* The book — scales from far away to a close-up, then zooms into the camera */
+.intro__book{position:relative;width:230px;height:322px;transform-style:preserve-3d;
+  transform:scale(.2) translateZ(-260px) rotateX(8deg) rotateY(20deg);
+  transition:transform 1.5s cubic-bezier(.45,.05,.2,1);}
+.intro--approach .intro__book,
+.intro--open .intro__book,
+.intro--tornado .intro__book{
+  transform:scale(1) translateZ(0) rotateX(4deg) rotateY(-14deg);}
+.intro--zoom .intro__book{
+  transform:scale(7.5) translateZ(460px) rotateX(0deg) rotateY(0deg);
+  transition:transform 1.2s cubic-bezier(.6,.02,.75,1);}
+
+/* Inner pages, revealed when the cover opens */
+.intro__pages{position:absolute;inset:0;border-radius:5px 9px 9px 5px;
+  background:linear-gradient(95deg,#e9edf3 0 7px,#fff 7px);
+  box-shadow:0 24px 55px -20px rgba(15,30,70,.5);
+  display:flex;flex-direction:column;justify-content:center;gap:13px;padding:36px 28px;}
+.intro__pages span{height:7px;border-radius:4px;background:#e7ebf2;}
+.intro__pages span:nth-child(2){width:78%;}
+.intro__pages span:nth-child(3){width:58%;}
+
+/* Front cover, opens with a 3D rotation around its spine */
+.intro__cover{position:absolute;inset:0;border-radius:4px 9px 9px 4px;
+  transform-origin:left center;transform:rotateY(0deg);
+  transition:transform .9s cubic-bezier(.5,.05,.2,1);
+  background:linear-gradient(135deg,var(--blue),#0f2247);
+  box-shadow:0 28px 58px -20px rgba(15,30,70,.7);
+  padding:30px 26px;display:flex;flex-direction:column;color:#fff;backface-visibility:hidden;}
+.intro__cover::after{content:"";position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(115deg,rgba(255,255,255,.16),transparent 42%);}
+.intro--open .intro__cover,
+.intro--tornado .intro__cover,
+.intro--zoom .intro__cover{transform:rotateY(-160deg);}
+.intro__genre{font-family:var(--font-ui);font-size:11px;font-weight:600;letter-spacing:.18em;
+  text-transform:uppercase;color:rgba(255,255,255,.72);}
+.intro__title{font-family:var(--font-display);font-size:34px;line-height:1.08;margin-top:auto;
+  letter-spacing:-.01em;text-wrap:balance;}
+.intro__author{font-family:var(--font-display);font-style:italic;font-size:15px;
+  color:rgba(255,255,255,.8);margin-top:12px;}
+
+/* Tornado of letters swirling out of the open book */
+.intro__tornado{position:absolute;left:50%;top:40%;width:0;height:0;}
+.intro__letter{position:absolute;left:0;top:0;font-family:var(--font-display);font-weight:500;
+  font-size:26px;color:var(--blue);transform-origin:center;opacity:0;
+  animation-name:introTornado;animation-timing-function:ease-out;animation-fill-mode:both;}
+@keyframes introTornado{
+  0%{opacity:0;transform:rotate(var(--a)) translateY(-8px) scale(.3);}
+  18%{opacity:1;}
+  100%{opacity:0;transform:rotate(calc(var(--a) + 250deg)) translateY(calc(var(--r) * -1)) scale(1.2);}
+}
+
+/* Whiteout that fills the screen as we dive into the pages */
+.intro__flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;
+  transition:opacity 1s ease;}
+.intro--zoom .intro__flash{opacity:1;transition-delay:.3s;}
+
+.intro__skip{position:absolute;bottom:22px;right:22px;z-index:2;border:none;cursor:pointer;
+  background:rgba(27,59,111,.08);color:var(--blue);border-radius:100px;
+  font-family:var(--font-ui);font-weight:600;font-size:13px;padding:9px 16px;}
+.intro__skip:hover{background:rgba(27,59,111,.16);}
+@media (prefers-reduced-motion:reduce){.intro{display:none;}}

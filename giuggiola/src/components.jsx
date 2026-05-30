@@ -1,5 +1,79 @@
 import { useState, useEffect } from 'react'
 
+/* ---------- Intro animation ---------- */
+
+const INTRO_LETTERS = ('GIUGGIOLA’STHINK' + 'GIUGGIOLA’STHINK').split('')
+
+export function Intro({ onDone }) {
+  const [phase, setPhase] = useState('far')
+
+  useEffect(() => {
+    const reduce = window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduce) { onDone(); return }
+
+    // Timeline (ms): far → approach → open → tornado → zoom → out → done
+    const seq = [
+      [250, 'approach'],
+      [1750, 'open'],
+      [2650, 'tornado'],
+      [4150, 'zoom'],
+      [5250, 'out'],
+      [5800, '__done'],
+    ]
+    const timers = seq.map(([t, p]) =>
+      setTimeout(() => (p === '__done' ? onDone() : setPhase(p)), t)
+    )
+    document.body.style.overflow = 'hidden'
+    return () => {
+      timers.forEach(clearTimeout)
+      document.body.style.overflow = ''
+    }
+  }, [onDone])
+
+  const showTornado = phase === 'tornado' || phase === 'zoom'
+
+  return (
+    <div className={'intro intro--' + phase} role="presentation">
+      <div className="intro__scene">
+        <div className="intro__book">
+          <div className="intro__pages" aria-hidden="true">
+            <span /><span /><span />
+          </div>
+          <div className="intro__cover" aria-hidden="true">
+            <span className="intro__genre">Pensieri, parole e libri</span>
+            <span className="intro__title">Giuggiola&rsquo;s Think</span>
+            <span className="intro__author">Giuggiola</span>
+          </div>
+          {showTornado && (
+            <div className="intro__tornado" aria-hidden="true">
+              {INTRO_LETTERS.map((ch, i) => {
+                const a = (i * 47) % 360
+                const r = 130 + ((i * 53) % 230)
+                const delay = (i % 14) * 55
+                const dur = 1150 + ((i * 37) % 750)
+                return (
+                  <span key={i} className="intro__letter"
+                    style={{
+                      '--a': a + 'deg',
+                      '--r': r + 'px',
+                      animationDelay: delay + 'ms',
+                      animationDuration: dur + 'ms',
+                    }}>
+                    {ch}
+                  </span>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="intro__flash" aria-hidden="true" />
+      <button className="intro__skip" onClick={onDone}>Salta intro</button>
+    </div>
+  )
+}
+
 /* ---------- Small atoms ---------- */
 
 export function Kicker({ children }) {
