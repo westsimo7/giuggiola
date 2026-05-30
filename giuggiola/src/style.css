@@ -367,7 +367,7 @@ select.twk-field{padding-right:22px;}
    Box = one page; centred in the scene. */
 .intro__book{position:relative;width:252px;height:340px;transform-style:preserve-3d;
   transform:scale(.16) translateZ(-300px) rotateX(8deg) rotateY(16deg);
-  transition:transform 1.6s cubic-bezier(.45,.05,.2,1);}
+  transition:transform 1.3s cubic-bezier(.45,.05,.2,1);}
 .intro--approach .intro__book,
 .intro--open .intro__book,
 .intro--burst .intro__book{
@@ -409,7 +409,7 @@ select.twk-field{padding-right:22px;}
    Closed: front shown. Open: it swings left and the inside stays in view. */
 .intro__cover{position:absolute;inset:0;transform-origin:left center;transform-style:preserve-3d;
   transform:rotateY(0deg) translateZ(4px);
-  transition:transform 1.1s cubic-bezier(.5,.05,.2,1);}
+  transition:transform .8s cubic-bezier(.5,.05,.2,1);}
 .intro--open .intro__cover,
 .intro--burst .intro__cover,
 .intro--zoom .intro__cover{transform:rotateY(-172deg) translateZ(4px);}
@@ -431,17 +431,19 @@ select.twk-field{padding-right:22px;}
 .intro__author{font-family:var(--font-display);font-style:italic;font-size:14px;
   color:rgba(255,255,255,.8);margin-top:10px;}
 
-/* Letters fired hard from the centre to random spots across the whole page */
+/* Letters burst out of the open book in an expanding vortex */
 .intro__burst{position:absolute;inset:0;pointer-events:none;}
-.intro__letter{position:absolute;left:50%;top:50%;font-family:var(--font-display);font-weight:600;
+.intro__letter{position:absolute;left:50%;top:50%;font-family:var(--font-display);font-weight:700;
   color:var(--blue);opacity:0;will-change:transform,opacity;
-  animation-name:introShoot;animation-timing-function:cubic-bezier(.1,.78,.24,1);
+  animation-name:introVortex;animation-timing-function:cubic-bezier(.3,.6,.4,1);
   animation-fill-mode:both;}
-@keyframes introShoot{
-  0%{opacity:0;transform:translate(-50%,-50%) scale(.15) rotate(0deg);}
-  9%{opacity:1;}
-  100%{opacity:0;
-    transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(1) rotate(var(--rot));}
+@keyframes introVortex{
+  0%{opacity:0;transform:translate(-50%,-50%) rotate(0deg) scale(0);}
+  18%{opacity:1;transform:translate(calc(-50% + var(--x1)),calc(-50% + var(--y1)))
+        rotate(var(--r1)) scale(1);}
+  68%{opacity:1;}
+  100%{opacity:0;transform:translate(calc(-50% + var(--x2)),calc(-50% + var(--y2)))
+        rotate(var(--r2)) scale(.28);}
 }
 
 /* Whiteout that fills the screen as we dive into the pages */

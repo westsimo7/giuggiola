@@ -8,22 +8,29 @@ const INTRO_SRC = 'GIUGGIOLA’STHINKPENSIERIPAROLELIBRI'.split('')
 export function Intro({ onDone }) {
   const [phase, setPhase] = useState('far')
 
-  // Letters fired hard from the centre to random spots across the whole page.
-  // Computed once per play so each visit scatters differently.
+  // Letters burst out of the open book in an expanding vortex (spiral outward
+  // + rise). Computed once per play so each visit swirls differently.
   const letters = useMemo(() => {
     const out = []
-    const N = 56
+    const N = 44
     for (let i = 0; i < N; i++) {
-      const ang = Math.random() * Math.PI * 2
-      const dist = 28 + Math.random() * 42 // viewport-relative throw distance
+      const baseAng = Math.random() * Math.PI * 2
+      const spin = (1.4 + Math.random() * 2.2) * (Math.random() < 0.5 ? -1 : 1)
+      const midR = 55 + Math.random() * 95
+      const endR = 190 + Math.random() * 280
+      const rise = 90 + Math.random() * 230
       out.push({
         ch: INTRO_SRC[i % INTRO_SRC.length],
-        tx: (Math.cos(ang) * dist).toFixed(1) + 'vw',
-        ty: (Math.sin(ang) * dist).toFixed(1) + 'vh',
-        rot: (Math.random() * 760 - 380).toFixed(0) + 'deg',
-        sz: (16 + Math.random() * 34).toFixed(0) + 'px',
-        delay: (Math.random() * 240).toFixed(0) + 'ms',
-        dur: (480 + Math.random() * 420).toFixed(0) + 'ms',
+        x1: (Math.cos(baseAng) * midR).toFixed(1) + 'px',
+        y1: (Math.sin(baseAng) * midR - rise * 0.3).toFixed(1) + 'px',
+        x2: (Math.cos(baseAng + spin) * endR).toFixed(1) + 'px',
+        y2: (Math.sin(baseAng + spin) * endR - rise).toFixed(1) + 'px',
+        r1: (Math.random() * 360 - 180).toFixed(0) + 'deg',
+        r2: ((Math.random() * 360 - 180) + (180 + Math.random() * 540) * (spin < 0 ? -1 : 1)).toFixed(0) + 'deg',
+        sz: (16 + Math.random() * 26).toFixed(0) + 'px',
+        gold: Math.random() < 0.22,
+        delay: (Math.random() * 350).toFixed(0) + 'ms',
+        dur: (800 + Math.random() * 600).toFixed(0) + 'ms',
       })
     }
     return out
@@ -35,14 +42,14 @@ export function Intro({ onDone }) {
     if (reduce) { onDone(); return }
 
     // Timeline (ms): far → approach (zoom onto the closed cover) → open
-    //  → (linger on the open book) → burst → zoom into the page → out → done
+    //  immediately → burst (vortex) → dive into the page → out → done
     const seq = [
-      [250, 'approach'],
-      [2300, 'open'],
-      [3900, 'burst'],
-      [5200, 'zoom'],
-      [6400, 'out'],
-      [6950, '__done'],
+      [200, 'approach'],
+      [1500, 'open'],
+      [2350, 'burst'],
+      [3650, 'zoom'],
+      [4450, 'out'],
+      [5000, '__done'],
     ]
     const timers = seq.map(([t, p]) =>
       setTimeout(() => (p === '__done' ? onDone() : setPhase(p)), t)
@@ -91,8 +98,10 @@ export function Intro({ onDone }) {
           {letters.map((l, i) => (
             <span key={i} className="intro__letter"
               style={{
-                '--tx': l.tx, '--ty': l.ty, '--rot': l.rot,
+                '--x1': l.x1, '--y1': l.y1, '--x2': l.x2, '--y2': l.y2,
+                '--r1': l.r1, '--r2': l.r2,
                 fontSize: l.sz, animationDelay: l.delay, animationDuration: l.dur,
+                color: l.gold ? '#C9A227' : undefined,
               }}>
               {l.ch}
             </span>
