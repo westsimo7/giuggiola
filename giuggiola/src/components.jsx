@@ -1,25 +1,47 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 /* ---------- Intro animation ---------- */
 
-const INTRO_LETTERS = ('GIUGGIOLA’STHINK' + 'GIUGGIOLA’STHINK').split('')
+const INTRO_LINES = ['100%', '92%', '97%', '85%', '100%', '78%', '94%']
+const INTRO_SRC = 'GIUGGIOLA’STHINKPENSIERIPAROLELIBRI'.split('')
 
 export function Intro({ onDone }) {
   const [phase, setPhase] = useState('far')
+
+  // Letters fired hard from the centre to random spots across the whole page.
+  // Computed once per play so each visit scatters differently.
+  const letters = useMemo(() => {
+    const out = []
+    const N = 56
+    for (let i = 0; i < N; i++) {
+      const ang = Math.random() * Math.PI * 2
+      const dist = 28 + Math.random() * 42 // viewport-relative throw distance
+      out.push({
+        ch: INTRO_SRC[i % INTRO_SRC.length],
+        tx: (Math.cos(ang) * dist).toFixed(1) + 'vw',
+        ty: (Math.sin(ang) * dist).toFixed(1) + 'vh',
+        rot: (Math.random() * 760 - 380).toFixed(0) + 'deg',
+        sz: (16 + Math.random() * 34).toFixed(0) + 'px',
+        delay: (Math.random() * 240).toFixed(0) + 'ms',
+        dur: (480 + Math.random() * 420).toFixed(0) + 'ms',
+      })
+    }
+    return out
+  }, [])
 
   useEffect(() => {
     const reduce = window.matchMedia &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduce) { onDone(); return }
 
-    // Timeline (ms): far → approach → open → tornado → zoom → out → done
+    // Timeline (ms): far → approach → open → (linger) → burst → zoom → out → done
     const seq = [
       [250, 'approach'],
-      [1750, 'open'],
-      [2650, 'tornado'],
-      [4150, 'zoom'],
-      [5250, 'out'],
-      [5800, '__done'],
+      [1900, 'open'],
+      [3300, 'burst'],
+      [4700, 'zoom'],
+      [5900, 'out'],
+      [6450, '__done'],
     ]
     const timers = seq.map(([t, p]) =>
       setTimeout(() => (p === '__done' ? onDone() : setPhase(p)), t)
@@ -31,43 +53,50 @@ export function Intro({ onDone }) {
     }
   }, [onDone])
 
-  const showTornado = phase === 'tornado' || phase === 'zoom'
+  const showBurst = phase === 'burst' || phase === 'zoom'
 
   return (
     <div className={'intro intro--' + phase} role="presentation">
       <div className="intro__scene">
         <div className="intro__book">
+          {/* open two-page spread */}
           <div className="intro__pages" aria-hidden="true">
-            <span /><span /><span />
+            <div className="intro__page intro__page--l">
+              {INTRO_LINES.map((w, i) => <span key={i} style={{ width: w }} />)}
+            </div>
+            <div className="intro__page intro__page--r">
+              {INTRO_LINES.map((w, i) => <span key={i} style={{ width: w }} />)}
+            </div>
+            {/* leaves that riffle over when the letters are released */}
+            <span className="intro__leaf" />
+            <span className="intro__leaf" />
+            <span className="intro__leaf" />
+            <span className="intro__leaf" />
           </div>
+
+          {/* front cover that swings open and stays open */}
           <div className="intro__cover" aria-hidden="true">
             <span className="intro__genre">Pensieri, parole e libri</span>
             <span className="intro__title">Giuggiola&rsquo;s Think</span>
             <span className="intro__author">Giuggiola</span>
           </div>
-          {showTornado && (
-            <div className="intro__tornado" aria-hidden="true">
-              {INTRO_LETTERS.map((ch, i) => {
-                const a = (i * 47) % 360
-                const r = 130 + ((i * 53) % 230)
-                const delay = (i % 14) * 55
-                const dur = 1150 + ((i * 37) % 750)
-                return (
-                  <span key={i} className="intro__letter"
-                    style={{
-                      '--a': a + 'deg',
-                      '--r': r + 'px',
-                      animationDelay: delay + 'ms',
-                      animationDuration: dur + 'ms',
-                    }}>
-                    {ch}
-                  </span>
-                )
-              })}
-            </div>
-          )}
         </div>
       </div>
+
+      {showBurst && (
+        <div className="intro__burst" aria-hidden="true">
+          {letters.map((l, i) => (
+            <span key={i} className="intro__letter"
+              style={{
+                '--tx': l.tx, '--ty': l.ty, '--rot': l.rot,
+                fontSize: l.sz, animationDelay: l.delay, animationDuration: l.dur,
+              }}>
+              {l.ch}
+            </span>
+          ))}
+        </div>
+      )}
+
       <div className="intro__flash" aria-hidden="true" />
       <button className="intro__skip" onClick={onDone}>Salta intro</button>
     </div>
