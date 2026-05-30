@@ -34,14 +34,15 @@ export function Intro({ onDone }) {
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduce) { onDone(); return }
 
-    // Timeline (ms): far → approach → open → (linger) → burst → zoom → out → done
+    // Timeline (ms): far → approach (zoom onto the closed cover) → open
+    //  → (linger on the open book) → burst → zoom into the page → out → done
     const seq = [
       [250, 'approach'],
-      [1900, 'open'],
-      [3300, 'burst'],
-      [4700, 'zoom'],
-      [5900, 'out'],
-      [6450, '__done'],
+      [2300, 'open'],
+      [3900, 'burst'],
+      [5200, 'zoom'],
+      [6400, 'out'],
+      [6950, '__done'],
     ]
     const timers = seq.map(([t, p]) =>
       setTimeout(() => (p === '__done' ? onDone() : setPhase(p)), t)
@@ -59,26 +60,28 @@ export function Intro({ onDone }) {
     <div className={'intro intro--' + phase} role="presentation">
       <div className="intro__scene">
         <div className="intro__book">
-          {/* open two-page spread */}
-          <div className="intro__pages" aria-hidden="true">
-            <div className="intro__page intro__page--l">
+          {/* inner page, revealed when the cover opens */}
+          <div className="intro__page intro__page--r" aria-hidden="true">
+            <div className="intro__lines">
               {INTRO_LINES.map((w, i) => <span key={i} style={{ width: w }} />)}
             </div>
-            <div className="intro__page intro__page--r">
-              {INTRO_LINES.map((w, i) => <span key={i} style={{ width: w }} />)}
+            <div className="intro__leaves">
+              <span className="intro__leaf" />
+              <span className="intro__leaf" />
+              <span className="intro__leaf" />
+              <span className="intro__leaf" />
             </div>
-            {/* leaves that riffle over when the letters are released */}
-            <span className="intro__leaf" />
-            <span className="intro__leaf" />
-            <span className="intro__leaf" />
-            <span className="intro__leaf" />
           </div>
 
-          {/* front cover that swings open and stays open */}
+          {/* front cover: closed at first (we zoom onto it), then swings open
+              and stays open — its inside face remains in view */}
           <div className="intro__cover" aria-hidden="true">
-            <span className="intro__genre">Pensieri, parole e libri</span>
-            <span className="intro__title">Giuggiola&rsquo;s Think</span>
-            <span className="intro__author">Giuggiola</span>
+            <div className="intro__face intro__face--front">
+              <span className="intro__genre">Pensieri, parole e libri</span>
+              <span className="intro__title">Giuggiola&rsquo;s Think</span>
+              <span className="intro__author">Giuggiola</span>
+            </div>
+            <div className="intro__face intro__face--back" />
           </div>
         </div>
       </div>
