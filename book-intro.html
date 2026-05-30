@@ -328,10 +328,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:3
     book.style.transform = 'scale(1) rotateY(8deg) rotateX(2deg)';
     await sleep(1300); if(aborted) return;
 
-    // Step 3 — brief pause in close-up
-    await sleep(220); if(aborted) return;
-
-    // Step 4 — cover opens around its left edge
+    // Step 4 — cover opens immediately once the zoom finishes
+    if(aborted) return;
     cover.style.transition = 'transform var(--t-open) cubic-bezier(.65,0,.35,1)';
     cover.style.transform = 'translateZ(2px) rotateY(-160deg)';
     await sleep(800); if(aborted) return;
